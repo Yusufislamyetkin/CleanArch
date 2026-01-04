@@ -20,7 +20,6 @@ COPY ["src/BuildingBlocks/Application/BuildingBlocks.Application.csproj", "src/B
 COPY ["src/BuildingBlocks/Infrastructure/BuildingBlocks.Infrastructure.csproj", "src/BuildingBlocks/Infrastructure/"]
 COPY ["src/BuildingBlocks/WebHost/BuildingBlocks.WebHost.csproj", "src/BuildingBlocks/WebHost/"]
 COPY ["src/Services/Banking/Banking.Domain/Banking.Domain.csproj", "src/Services/Banking/Banking.Domain/"]
-COPY ["src/Services/Banking/Banking.Application/Banking.Application.csproj", "src/Services/Banking/Banking.Application/"]
 COPY ["src/Services/Banking/Banking.Infrastructure/Banking.Infrastructure.csproj", "src/Services/Banking/Banking.Infrastructure/"]
 COPY ["src/Services/Banking/Banking.Api/Banking.Api.csproj", "src/Services/Banking/Banking.Api/"]
 

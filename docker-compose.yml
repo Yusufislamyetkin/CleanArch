@@ -1,27 +1,28 @@
 version: '3.8'
 
 services:
-  # SQL Server Database
+  # PostgreSQL Database
   banking-db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: postgres:15-alpine
     container_name: enterprise-banking-db
     environment:
-      ACCEPT_EULA: Y
-      MSSQL_SA_PASSWORD: YourStrong!Passw0rd
-      MSSQL_PID: Express
+      POSTGRES_DB: BankingDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
     ports:
-      - "1433:1433"
+      - "5432:5432"
     volumes:
-      - banking_db_data:/var/opt/mssql
+      - banking_db_data:/var/lib/postgresql/data
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - enterprise-banking
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U postgres -d BankingDb"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # Redis Cache
   banking-cache:
@@ -70,23 +71,18 @@ services:
     container_name: enterprise-banking-service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:5000
-      ConnectionStrings__DefaultConnection: Server=banking-db;Database=BankingDDD;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true
+      ConnectionStrings__DefaultConnection: Host=banking-db;Port=5432;Database=BankingDb;Username=postgres;Password=postgres123
       RabbitMQ__HostName: banking-broker
       RabbitMQ__Port: 5672
       RabbitMQ__UserName: guest
       RabbitMQ__Password: guest
       Redis__ConnectionString: banking-cache:6379,password=redis123
-      ASPNETCORE_HTTP_PORTS: 5000
     ports:
-      - "5000:5000"
+      - "5000:80"
     depends_on:
-      banking-db:
-        condition: service_healthy
-      banking-broker:
-        condition: service_healthy
-      banking-cache:
-        condition: service_healthy
+      - banking-db
+      - banking-broker
+      - banking-cache
     networks:
       - enterprise-banking
     restart: unless-stopped

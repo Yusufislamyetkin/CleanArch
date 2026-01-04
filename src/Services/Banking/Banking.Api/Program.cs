@@ -30,7 +30,7 @@ builder.Services.AddCors(options =>
 // Configure Health Checks
 builder.Services.AddHealthChecks();
 
-builder.WebHost.UseUrls("http://localhost:5001");
+builder.WebHost.UseUrls("http://+:80");
 
 var app = builder.Build();
 
